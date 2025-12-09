@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  streamlit:
+    build: .
+    container_name: nlp-streamlit
+    ports:
+      - "8501:8501"
+      - "8888:8888"   # JupyterLab
+    volumes:
+      - .:/app
+    depends_on:
+      - chromadb
+      - airflow
+
+  chromadb:
+    image: chromadb/chroma
+    container_name: nlp-chromadb
+    ports:
+      - "8001:8000"
+
+  airflow:
+    image: apache/airflow:2.6.0
+    container_name: nlp-airflow
+    ports:
+      - "8080:8080"
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - ./dags:/opt/airflow/dags
+    command: >
+      bash -c "
+        airflow db init &&
+        airflow users create --username oussama --firstname Oussama --lastname Edd --role Admin --email oussama@gmail.com --password admin &&
+        airflow scheduler &
+        airflow webserver
+      "
+
