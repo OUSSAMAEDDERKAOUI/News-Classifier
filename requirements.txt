@@ -1,0 +1,14 @@
+pandas
+numpy
+scikit-learn
+datasets
+sentence-transformers
+chromadb
+streamlit
+apache-airflow
+torch
+jupyterlab
+matplotlib
+seaborn
+plotly
+altair
