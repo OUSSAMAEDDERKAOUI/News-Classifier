@@ -29,6 +29,5 @@ def run() :
     train_metadata = df_train[["id", "label", "label_text"]]
     test_metadata  = df_test[["id", "label", "label_text"]]
 
-
     train_metadata.to_csv("./data/metadata/train_metadata.csv", index=False)
     test_metadata.to_csv("./data/metadata/test_metadata.csv", index=False)

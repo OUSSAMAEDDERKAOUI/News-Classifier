@@ -14,3 +14,4 @@ venv/
 
 # Data folders
 data/
+model/
