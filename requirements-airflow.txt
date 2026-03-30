@@ -1,0 +1,10 @@
+# Dépendances du pipeline de data/ML
+pandas
+numpy
+scikit-learn
+datasets
+sentence-transformers
+chromadb
+torch 
+nltk
+

@@ -1,0 +1,54 @@
+FROM apache/airflow:2.8.4-python3.10  
+
+USER root
+# Installer dépendances système si besoin
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    wget \
+    unzip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copier requirements.txt
+COPY requirements-airflow.txt /tmp/
+
+# ===============================================
+# Début de la zone d'installation des packages Python 
+# ===============================================
+USER airflow
+
+# Mettre à jour pip 
+RUN pip install --upgrade pip --default-timeout=1000
+
+# 🎯 CORRECTION 2: Forcer Pydantic 2.x pour éviter les conflits et supporter les libs récentes
+RUN pip install "pydantic>=2.0" --upgrade --default-timeout=1000 
+
+# Augmenter le timeout de pip à 1000 secondes et installer les packages
+RUN pip install --no-cache-dir -r /tmp/requirements-airflow.txt --default-timeout=1000
+# ===============================================
+# Fin de la zone d'installation des packages Python
+# ===============================================
+
+
+# 🎯 CORRECTION 3: Créer les répertoires nécessaires et donner les permissions
+USER root
+RUN mkdir -p /opt/airflow/data/raw \
+             /opt/airflow/data/metadata \
+             /opt/airflow/data/embeddings \
+             /opt/airflow/data/chroma_DB \
+             /opt/airflow/models 
+
+
+# Les volumes peuvent se chevaucher, mais il est plus sûr d'inclure les commandes
+COPY dags /opt/airflow/dags
+COPY pipeline /opt/airflow/pipeline
+
+# Donner la propriété à airflow pour tous les dossiers de travail
+RUN chown -R airflow: /opt/airflow/dags \
+                      /opt/airflow/pipeline \
+                      /opt/airflow/data \
+                      /opt/airflow/models
+
+
+
+USER airflow
